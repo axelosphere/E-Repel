@@ -84,7 +84,7 @@ if (!isset($_SESSION['username'])) {
 
             <ul class="nav flex-column mt-4">
                 <li class="nav-item">
-                    <a class="nav-link text-white d-flex align-items-center px-3 py-2" href="index1.php">
+                    <a class="nav-link text-white d-flex align-items-center px-3 py-2" href="index.php">
                         <i class="bi bi-house fs-5 me-2"></i> <span class="fw-medium">Dashboard</span>
                     </a>
                 </li>
@@ -160,17 +160,20 @@ if (!isset($_SESSION['username'])) {
                                 </tr>
                             </thead>
                             <tbody id="detectionTableBody">
-                                <?php if ($result->num_rows > 0): ?>
-                                    <?php while ($row = $result->fetch_assoc()): ?>
+                                <?php
+                                $rows = $result->fetchAll(PDO::FETCH_ASSOC); // fetch all rows
+                                ?>
+                                <?php if (count($rows) > 0): ?>
+                                    <?php foreach ($rows as $row): ?>
                                         <tr>
                                             <td><?= htmlspecialchars($row['bird_type']) ?></td>
                                             <td><?= htmlspecialchars($row['detection_time']) ?></td>
                                             <td><?= htmlspecialchars($row['count']) ?></td>
                                         </tr>
-                                    <?php endwhile; ?>
-                                <?php else: ?>
-                                    <tr><td colspan="3" class="text-center">No detections found.</td></tr>
-                                <?php endif; ?>
+                                        <?php endforeach; ?>
+                                    <?php else: ?>
+                                        <tr><td colspan="3" class="text-center">No detections found.</td></tr>
+                                    <?php endif; ?>
                             </tbody>
                         </table>
                     </div>
@@ -335,4 +338,5 @@ if (!isset($_SESSION['username'])) {
 </body>
 
 </html>
+
 
