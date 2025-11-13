@@ -1,6 +1,6 @@
 <?php
 session_start();
-include 'db/db.php';
+require_once 'db.php';
 
 if (!isset($_SESSION['username'])) {
   header("Location: login.php");
@@ -382,4 +382,5 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['register'])) {
             });
     </script>
 </body>
+
 </html>
