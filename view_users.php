@@ -1,5 +1,5 @@
 <?php
-require_once 'db.php';
+require_once 'db/db.php';
 
 // CSRF token
 if (empty($_SESSION['csrf_token'])) {
@@ -230,4 +230,5 @@ $result = $conn->query($sql);
 
 </body>
 </html>
+
 
