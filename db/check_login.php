@@ -1,6 +1,6 @@
 <?php
 session_start();
-require 'db.php'; // Make sure this returns a $pdo connection (from your new PDO setup)
+require_once 'db.php'; // Make sure this returns a $pdo connection (from your new PDO setup)
 
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $username = trim($_POST['username'] ?? '');
@@ -43,4 +43,5 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     }
 }
 ?>
+
 
