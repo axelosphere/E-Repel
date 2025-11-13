@@ -1,6 +1,6 @@
 <?php
 session_start();
-require_once 'db/db.php';
+require_once __DIR__ . '/db/db.php';
 
 if (!isset($_SESSION['username'])) {
     header("Location: login.php");
@@ -281,3 +281,4 @@ $result = $conn->query($sql);
 </body>
 
 </html>
+
