@@ -1,6 +1,6 @@
 <?php
 session_start();
-require_once 'db.php';
+require_once 'db/db.php';
 include 'db/data_rep.php';
 
 if (!isset($_SESSION['username'])) {
@@ -335,3 +335,4 @@ if (!isset($_SESSION['username'])) {
 </body>
 
 </html>
+
