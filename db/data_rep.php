@@ -1,5 +1,5 @@
 <?php
-require 'db.php'; // ensure this defines $pdo (your PDO connection)
+require_once 'db.php';// ensure this defines $pdo (your PDO connection)
 
 // ============================
 // Detection logs query
@@ -76,3 +76,4 @@ if ($output) {
     }
 }
 ?>
+
