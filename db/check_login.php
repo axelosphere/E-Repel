@@ -1,31 +1,44 @@
 <?php
-session_start();    
-include 'db.php';
+session_start();
+require 'db.php'; // Make sure this returns a $pdo connection (from your new PDO setup)
 
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $username = $_POST['username'];
-    $password = $_POST['password'];
+if ($_SERVER["REQUEST_METHOD"] === "POST") {
+    $username = trim($_POST['username'] ?? '');
+    $password = $_POST['password'] ?? '';
 
-    // Check user in database
-    $sql = "SELECT * FROM users WHERE username='$username'";
-    $result = $conn->query($sql);
+    if (empty($username) || empty($password)) {
+        $_SESSION['error'] = 'Please fill in all fields.';
+        header("Location: ../login.php");
+        exit();
+    }
 
-    if ($result->num_rows == 1) {
-        $row = $result->fetch_assoc();      
+    try {
+        // Use prepared statement to prevent SQL injection
+        $stmt = $pdo->prepare("SELECT * FROM users WHERE username = :username LIMIT 1");
+        $stmt->execute([':username' => $username]);
+        $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
-        // Password check
-        if (password_verify($password,  hash: $row['password'])) {
-            $_SESSION['username'] = $username;
-            header("Location: ../index1.php"); // Redirect to dashboard
-            exit();
+        if ($user) {
+            // Verify password hash
+            if (password_verify($password, $user['password'])) {
+                $_SESSION['username'] = $user['username'];
+                header("Location: ../index1.php");
+                exit();
+            } else {
+                $_SESSION['error'] = 'Invalid password.';
+                header("Location: ../login.php");
+                exit();
+            }
         } else {
-            $_SESSION['error'] = 'Invalid password.';
-            header("Location: ../login.php"); // Redirect back to login
+            $_SESSION['error'] = 'User not found.';
+            header("Location: ../login.php");
             exit();
         }
-    } else {
-        $_SESSION['error'] = 'User not found.';
-        header("Location: ../login.php"); // Redirect back to login
+
+    } catch (PDOException $e) {
+        // Optional: log $e->getMessage() in a file if needed
+        $_SESSION['error'] = 'Database error. Please try again later.';
+        header("Location: ../login.php");
         exit();
     }
 }
