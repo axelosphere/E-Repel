@@ -1,6 +1,10 @@
 <?php
+require 'db.php'; // ensure this defines $pdo (your PDO connection)
 
-// Existing query for detection logs
+// ============================
+// Detection logs query
+// ============================
+
 $query = "
     SELECT 
         egret_detection_time AS detection_time,
@@ -16,12 +20,18 @@ $query = "
     ORDER BY detection_time DESC
 ";
 
-$result = $conn->query($query);
+$stmt = $pdo->query($query);
+$detectionLogs = $stmt ? $stmt->fetchAll(PDO::FETCH_ASSOC) : [];
 
-// --- Trend analysis for prediction ---
+// ============================
+// Trend analysis for prediction
+// ============================
+//
+// PostgreSQL doesn’t have HOUR(), so we use EXTRACT(HOUR FROM column)
+
 $trendQuery = "
     SELECT 
-        HOUR(detection_time) AS hour,
+        EXTRACT(HOUR FROM detection_time) AS hour,
         SUM(count) AS total_count
     FROM (
         SELECT egret_detection_time AS detection_time, egret_count AS count FROM egret_detections
@@ -32,37 +42,37 @@ $trendQuery = "
     ORDER BY hour ASC
 ";
 
-$trendResult = $conn->query($trendQuery);
+$stmt = $pdo->query($trendQuery);
 
 $predictedLabels = [];
 $predictedData = [];
 
-if ($trendResult && $trendResult->num_rows > 0) {
-    while ($row = $trendResult->fetch_assoc()) {
-        $predictedLabels[] = sprintf("%02d:00", $row['hour']); // 00:00, 01:00, etc.
+if ($stmt) {
+    while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+        $predictedLabels[] = sprintf("%02d:00", $row['hour']); // e.g., "00:00", "01:00"
         $predictedData[] = (int)$row['total_count'];
     }
 }
 
-// Fallback if no data
+// Default empty JSON arrays
 $predictedLabelsJson = json_encode($predictedLabels ?: []);
 $predictedDataJson = json_encode($predictedData ?: []);
 
+// ============================
+// Run Python prediction script
+// ============================
+//
+// Make sure your Python script path is correct relative to this file.
+// You can also log errors if needed for Render debugging.
 
-// --- Run Python prediction script ---
-$command = escapeshellcmd('python ../predict_birds.py'); // Adjust path to your script
+$command = escapeshellcmd('python3 ../predict_birds.py'); // Use python3 for Render/Supabase
 $output = shell_exec($command);
-
-$predictedLabelsJson = '[]';
-$predictedDataJson = '[]';
 
 if ($output) {
     $predictionData = json_decode($output, true);
-    if ($predictionData) {
+    if (is_array($predictionData)) {
         $predictedLabelsJson = json_encode($predictionData['labels']);
         $predictedDataJson = json_encode($predictionData['data']);
     }
 }
-
-
 ?>
