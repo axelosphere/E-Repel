@@ -22,7 +22,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             // Verify password hash
             if (password_verify($password, $user['password'])) {
                 $_SESSION['username'] = $user['username'];
-                header("Location: ../index1.php");
+                header("Location: ../index.php");
                 exit();
             } else {
                 $_SESSION['error'] = 'Invalid password.';
@@ -43,3 +43,4 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     }
 }
 ?>
+
