@@ -1,6 +1,6 @@
 <?php
 session_start();
-include 'db/db.php';
+require_once 'db/db.php';
 
 if (!isset($_SESSION['username'])) {
     header("Location: login.php");
@@ -126,7 +126,7 @@ $result = $conn->query($sql);
 
             <ul class="nav flex-column mt-4">
                 <li class="nav-item">
-                    <a class="nav-link text-white d-flex align-items-center px-3 py-2" href="index1.php">
+                    <a class="nav-link text-white d-flex align-items-center px-3 py-2" href="index.php">
                         <i class="bi bi-house fs-5 me-2"></i> <span class="fw-medium">Dashboard</span>
                     </a>
                 </li>
@@ -279,4 +279,5 @@ $result = $conn->query($sql);
         };
     </script>
 </body>
+
 </html>
